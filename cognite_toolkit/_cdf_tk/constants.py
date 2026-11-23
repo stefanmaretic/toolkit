@@ -67,6 +67,9 @@ EXCL_FILES = ["README.md", DEFAULT_CONFIG_FILE]
 # Resource folders that ship code in subdirectories (e.g. functions/<externalId>/handler.py).
 # YAML files in those subdirectories are code artifacts, not CDF resource definitions.
 RESOURCE_FOLDERS_WITH_CODE_BUNDLES = frozenset({"functions", "apps", "streamlit"})
+# Eval suites (eval/eval.yaml and the files it includes) in an agent directory. They are run with
+# `cdf agents eval` and are not CDF resource definitions.
+AGENT_EVAL_DIRECTORY = "eval"
 # Files to search for variables.
 SEARCH_VARIABLES_SUFFIX = frozenset([".yaml", "yml", ".sql", ".csv", ".md", ".ttl"])
 YAML_SUFFIX = frozenset([".yaml", ".yml"])

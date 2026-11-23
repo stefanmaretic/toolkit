@@ -23,6 +23,7 @@ global_config.silence_feature_preview_warnings = True
 from rich import print
 
 from cognite_toolkit._cdf_tk.apps import (
+    AgentsApp,
     APIApp,
     AuthApp,
     CoreApp,
@@ -111,6 +112,9 @@ if Flags.IMPORT_CMD.is_enabled():
 
 if Flags.API.is_enabled():
     _app.add_typer(APIApp(**default_typer_kws), name="api")
+
+if Flags.AGENT_EVALS.is_enabled():
+    _app.add_typer(AgentsApp(**default_typer_kws), name="agents")
 
 if Plugins.data.value.is_enabled():
     _app.add_typer(DataApp(**default_typer_kws), name="data")

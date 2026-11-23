@@ -32,6 +32,7 @@ from .api.apps import AppsAPI
 from .api.assets import AssetsAPI
 from .api.chart_scheduled_calculations import ChartScheduledCalculationsAPI
 from .api.charts_monitoring_job import ChartMonitoringJobsAPI
+from .api.chat_completions import ChatCompletionsAPI
 from .api.data_product_role_access_filters import DataProductRoleAccessFiltersAPI
 from .api.data_product_roles import DataProductRolesAPI
 from .api.data_product_versions import DataProductVersionsAPI
@@ -158,6 +159,7 @@ class ToolkitClientMock(ToolkitClient):
     sessions: MagicMock
     agents: MagicMock
     skills: MagicMock
+    chat_completions: MagicMock
     apps: MagicMock
     datapoint_subscriptions: MagicMock
     three_d: MagicMock
@@ -284,6 +286,7 @@ class ToolkitClientMock(ToolkitClient):
 
         self.agents = MagicMock(spec=AgentsAPI)
         self.skills = MagicMock(spec=SkillsAPI)
+        self.chat_completions = MagicMock(spec=ChatCompletionsAPI)
         self.apps = MagicMock(spec=AppsAPI)
         self.apps.versions = MagicMock(spec=AppVersionsAPI)
         self.datapoint_subscriptions = MagicMock(spec=DatapointSubscriptionsAPI)

@@ -128,6 +128,10 @@ class Flags(Enum):
         visible=False,
         description="Enables the check command plugin for checking CDF resources and configurations",
     )
+    AGENT_EVALS = FlagMetadata(
+        visible=True,
+        description="Enables 'cdf agents eval' for running eval suites (eval/eval.yaml) against Atlas AI agents",
+    )
 
     def is_enabled(self) -> bool:
         if self == Flags.CDF_GROUP_EMAILS:

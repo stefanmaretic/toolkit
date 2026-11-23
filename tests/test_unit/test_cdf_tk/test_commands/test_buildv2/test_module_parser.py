@@ -285,6 +285,24 @@ class TestIsInCodeBundleSubdirectory:
         assert ModuleParser._is_in_code_bundle_subdirectory(yaml_file, resource_folder) is expected
 
 
+class TestIsAgentEvalFile:
+    @pytest.mark.parametrize(
+        "yaml_file, resource_folder, expected",
+        [
+            pytest.param(Path("modules/m/agents/my_agent/eval/eval.yaml"), "agents", True, id="root eval suite"),
+            pytest.param(
+                Path("modules/m/agents/my_agent/eval/cases/maintenance.yaml"), "agents", True, id="included file"
+            ),
+            pytest.param(Path("modules/m/agents/my_agent/my_agent.Agent.yaml"), "agents", False, id="agent"),
+            pytest.param(Path("modules/m/agents/eval/pump.Agent.yaml"), "agents", False, id="agent in eval folder"),
+            pytest.param(Path("modules/m/eval/agents/a.Agent.yaml"), "agents", False, id="eval above agents"),
+            pytest.param(Path("modules/m/functions/eval/eval.yaml"), "functions", False, id="other folder"),
+        ],
+    )
+    def test_is_agent_eval_file(self, yaml_file: Path, resource_folder: ResourceTypes, expected: bool) -> None:
+        assert ModuleParser._is_agent_eval_file(yaml_file, resource_folder) is expected
+
+
 class TestGetModulePathFromResourceFilePath:
     @pytest.mark.parametrize(
         "resource_file, expected_module_path, expected_resource_folder",
