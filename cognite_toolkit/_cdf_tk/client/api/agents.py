@@ -8,11 +8,15 @@ Note: This is an alpha API and may change in future releases.
 
 import builtins
 from collections.abc import Iterable, Sequence
+from urllib.parse import quote
 
 from cognite_toolkit._cdf_tk.client.cdf_client import CDFResourceAPI, Endpoint, PagedResponse
 from cognite_toolkit._cdf_tk.client.http_client import HTTPClient, ItemsSuccessResponse, RequestMessage, SuccessResponse
 from cognite_toolkit._cdf_tk.client.identifiers import ExternalId
 from cognite_toolkit._cdf_tk.client.resource_classes.agent import AgentRequest, AgentResponse, ServicesAvailability
+from cognite_toolkit._cdf_tk.client.resource_classes.agent_chat import AgentChatRequest, AgentChatResponse
+
+AGENT_CHAT_API_VERSION = "20230101-alpha"
 
 
 class AgentsAPI(CDFResourceAPI[AgentResponse]):
@@ -105,6 +109,49 @@ class AgentsAPI(CDFResourceAPI[AgentResponse]):
             List of AgentResponse objects.
         """
         return self._list(limit=limit)
+
+    def chat_url(self, internal: bool = False, base_url: str | None = None) -> str:
+        """The URL of the agent chat endpoint.
+
+        Args:
+            internal: Use the internal chat route (``/ai/internal/agents/chat``). Cognite built-in
+                agents (external IDs starting with ``cdf_``) are only reachable on this route.
+            base_url: Send the request to this origin instead of the CDF cluster, for example a local
+                agent runtime on ``http://127.0.0.1:5000``. The path is the same as on the cluster.
+
+        Returns:
+            The full URL of the chat endpoint.
+        """
+        path = "/ai/internal/agents/chat" if internal else "/ai/agents/chat"
+        if base_url is None:
+            return self._make_url(path)
+        return f"{base_url.rstrip('/')}/api/v1/projects/{quote(self._http_client.config.project, safe='')}{path}"
+
+    def chat(self, request: AgentChatRequest, internal: bool = False, base_url: str | None = None) -> AgentChatResponse:
+        """Send one chat request to an agent.
+
+        A conversation is continued by passing the ``cursor`` from the previous response. When the
+        agent asks for a tool confirmation or a user session, answer it by sending an action message
+        with the same cursor.
+
+        Args:
+            request: The chat request.
+            internal: Use the internal chat route. See `chat_url`.
+            base_url: Send the request to another origin. See `chat_url`.
+
+        Returns:
+            The agent's response.
+        """
+        message = RequestMessage(
+            endpoint_url=self.chat_url(internal=internal, base_url=base_url),
+            method="POST",
+            body_content=request.dump(),
+            api_version=AGENT_CHAT_API_VERSION,
+            # A local agent runtime may not accept gzip-compressed bodies.
+            disable_gzip=base_url is not None,
+        )
+        response = self._http_client.request_single_retries(message).get_success_or_raise(message)
+        return AgentChatResponse.model_validate_json(response.body)
 
     def service_availability(self) -> ServicesAvailability:
         """Get the availability of AI services in the CDF project.

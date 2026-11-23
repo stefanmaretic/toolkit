@@ -10,6 +10,7 @@ from ._respace import RespaceCommand
 from ._upload import UploadCommand
 from ._validation import ValidationCommand
 from .about import AboutCommand
+from .agent_eval import AgentEvalCommand
 from .auth.command import AuthCommand
 from .build_v2.build_v2 import BuildV2Command
 from .deploy_v2.command import DeploymentStep, DeployOptions, DeployV2Command
@@ -31,6 +32,7 @@ from .run_function_app import RunFunctionAppCommand
 
 __all__ = [
     "AboutCommand",
+    "AgentEvalCommand",
     "AuthCommand",
     "BuildDeployValidateCommand",
     "BuildV2Command",

@@ -10,6 +10,7 @@ from .api.annotations import AnnotationsAPI
 from .api.apps import AppsAPI
 from .api.assets import AssetsAPI
 from .api.canvas import IndustrialCanvasAPI
+from .api.chat_completions import ChatCompletionsAPI
 from .api.cognite_files import CogniteFilesAPI
 from .api.containers import ContainersAPI
 from .api.data_models import DataModelsAPI
@@ -76,6 +77,7 @@ class ToolkitClient:
         self.console: Console = console or Console(markup=True)
         self.agents = AgentsAPI(http_client)
         self.skills = SkillsAPI(http_client)
+        self.chat_completions = ChatCompletionsAPI(http_client)
         self.apps = AppsAPI(http_client)
         self.annotations = AnnotationsAPI(http_client)
         self.assets = AssetsAPI(http_client)

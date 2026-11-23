@@ -17,7 +17,12 @@ from cognite_toolkit._cdf_tk.commands.build_v2.data_classes._module import (
     ModuleScanResult,
     NonExistingModuleName,
 )
-from cognite_toolkit._cdf_tk.constants import EXCL_FILES, MODULES, RESOURCE_FOLDERS_WITH_CODE_BUNDLES
+from cognite_toolkit._cdf_tk.constants import (
+    AGENT_EVAL_DIRECTORY,
+    EXCL_FILES,
+    MODULES,
+    RESOURCE_FOLDERS_WITH_CODE_BUNDLES,
+)
 from cognite_toolkit._cdf_tk.data_classes._insights import BuildError
 from cognite_toolkit._cdf_tk.data_classes._types import AbsoluteFilePath, RelativeDirPath, RelativeFilePath
 from cognite_toolkit._cdf_tk.resource_ios import RESOURCE_BASE_IO_BY_FOLDER_NAME_INCLUDE_ALPHA, ResourceTypes
@@ -146,6 +151,8 @@ class ModuleParser:
             if relative_module_path and resource_folder:
                 if cls._is_in_code_bundle_subdirectory(yaml_file, resource_folder):
                     continue
+                if cls._is_agent_eval_file(yaml_file, resource_folder):
+                    continue
                 if relative_module_path not in source_by_module_id:
                     source_by_module_id[relative_module_path] = ModuleDirectory(
                         path=module_directory / relative_module_path,
@@ -171,6 +178,22 @@ class ModuleParser:
         for parent in yaml_file.parents:
             if parent.name == resource_folder:
                 return yaml_file.parent != parent
+        return False
+
+    @staticmethod
+    def _is_agent_eval_file(yaml_file: Path, resource_folder: ResourceTypes) -> bool:
+        """Return True when YAML is part of an agent eval suite, for example ``agents/my_agent/eval/eval.yaml``.
+
+        Eval suites are run with ``cdf agents eval`` and are not CDF resource definitions. Agent definitions
+        (``*.Agent.yaml``) are still read, even if they are inside an ``eval`` directory.
+        """
+        if resource_folder != "agents" or yaml_file.stem.casefold().endswith(".agent"):
+            return False
+        for parent in yaml_file.parents:
+            if parent.name == resource_folder:
+                return False
+            if parent.name == AGENT_EVAL_DIRECTORY:
+                return True
         return False
 
     @staticmethod

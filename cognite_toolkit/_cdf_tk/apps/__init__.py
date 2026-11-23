@@ -1,3 +1,4 @@
+from ._agents_app import AgentsApp
 from ._api_app import APIApp
 from ._auth_app import AuthApp
 from ._core_app import CoreApp
@@ -16,6 +17,7 @@ from ._upload_app import UploadApp
 
 __all__ = [
     "APIApp",
+    "AgentsApp",
     "AuthApp",
     "CoreApp",
     "DataApp",
